@@ -4,10 +4,10 @@ function makehtml_eventid(eventid,comp)
 is_overwrite = 0;
 setup_parameters;
 
-if ~exist('htmls/event_files','dir')
-	mkdir('htmls/event_files');
+if ~exist(fullfile('htmls','event_files'),'dir')
+	mkdir(fullfile('htmls','event_files'));
 end
-html_file = fullfile('htmls','event_files'[eventid,'_',comp,'.html'];
+html_file = fullfile('htmls','event_files',[eventid,'_',comp,'.html']);
 if exist(html_file,'file') && ~is_overwrite
 	disp(['Exist: ',html_file,', skip!']);
 	return;
@@ -43,7 +43,7 @@ fprintf(fp,'</p>\n');
 
 fprintf(fp,'<p>\n');
 fprintf(fp,'Waveform and isolation window:<br>\n');
-fprintf(fp,'<img src="%s" width = "500"',['./pics/',eventid,'_waveform_',comp,'.jpg']);
+fprintf(fp,'<img src="%s" width = "500"',['./pics/',eventid,'_waveform_',comp,'.png']);
 fprintf(fp,'</p>\n');
 
 for ip=1:length(periods)
@@ -51,12 +51,11 @@ for ip=1:length(periods)
 	fprintf(fp,'Period: %d s <br>',periods(ip));
 	fprintf(fp,'Good measurement number: %d <br>',eventphv(ip).goodnum);
 	fprintf(fp,'Bad measurement number: %d <br>',eventphv(ip).badnum);
-	fprintf(fp,'<img src="%s" width = "500"',['./pics/',eventid,'_',comp,'_',num2str(ip),'.jpg']);
+	fprintf(fp,'<img src="%s" width = "500"',['./pics/',eventid,'_',comp,'_',num2str(ip),'.png']);
 	fprintf(fp,'</p>\n');
 end
 
 fprintf(fp,'<p>\n');
-fprintf(fp,'<a href="http://www.ldeo.columbia.edu/~ge.jin/projects/USarray.html">Back to Ge Jin''s Homepage</a>\n');
 fprintf(fp,'</p>\n');
 
 fprintf(fp,'</body>\n');
