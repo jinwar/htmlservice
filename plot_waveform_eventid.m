@@ -1,17 +1,24 @@
 function plot_waveform_eventid(eventid,comp)
 
 is_overwrite = 0;
+setup_parameters;
 
-if ~exist('htmls/event_files/pics','dir')
-	mkdir('htmls/event_files/pics')
+if ~exist(fullfile('htmls'),'dir')
+	mkdir(fullfile('htmls'))
 end
-img_file = ['./htmls/event_files/pics/',eventid,'_waveform_',comp,'.jpg'];
+if ~exist(fullfile('htmls','event_files'),'dir')
+	mkdir(fullfile('htmls','event_files'))
+end
+if ~exist(fullfile('htmls','event_files','pics'),'dir')
+	mkdir(fullfile('htmls','event_files','pics'))
+end
+img_file = ['./htmls/event_files/pics/',eventid,'_waveform_',comp,'.png'];
 if exist(img_file) && ~is_overwrite
 	disp(['Exist: ',img_file,', skip!'])
 	return;
 end
 
-matfile = ['../',comp,'/eventmat/',eventid,'_',comp,'.mat'];
+matfile = fullfile(gsdfpath,'eventmat',[eventid,'_',comp,'.mat']);
 if ~exist(matfile,'file')
 	disp(['Cannot find file:',matfile,', skip this plot']);
 	return
@@ -67,5 +74,5 @@ ylabel('Epicenter Distance','fontsize',20)
 xlim(time_range);
 ylim(dist_range);
 
-print('-djpeg',['./htmls/event_files/pics/',eventid,'_waveform_',comp]);
+export_fig(img_file,'-png','-m2');
 

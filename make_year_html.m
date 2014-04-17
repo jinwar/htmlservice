@@ -1,12 +1,13 @@
-function make_year_html(year,comp);
+function make_year_html(year);
 
+setup_parameters;
 yearstr = num2str(year);
-helm_files = dir(['../',comp,'/helmholtz/',yearstr,'*_helmholtz_',comp,'.mat']);
+helm_files = dir(fullfile(gsdfpath,'helmholtz',[yearstr,'*_helmholtz_',comp,'.mat']));
 % generate html list
 if ~exist('htmls','dir')
 	mkdir('htmls');
 end
-fp = fopen(['./htmls/',yearstr,'_eventlist_',comp,'.html'],'w');
+fp = fopen(fullfile('htmls',[yearstr,'_eventlist_',comp,'.html'],'w');
 
 fprintf(fp,'<html>\n');
 fprintf(fp,'<body>\n');

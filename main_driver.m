@@ -1,4 +1,4 @@
-% Main driver to run the web service maintainence.
+%Main driver to run the web service maintainence.
 % written by Ge Jin, jinwar@gmail.com
 %
 
@@ -11,5 +11,5 @@ plot_stack
 status_maker
 
 % make the catalog
-make_year_html(2013,'LHZ');
-make_year_html(2013,'LHT');
+make_year_html(2014);
+%make_year_html(2013,'LHT');

@@ -1,11 +1,8 @@
-function plot_eventid(eventid,comp,isoutput)
+function plot_eventid_ip(eventid,comp,ip)
 
 is_overwrite = 0;
 setup_parameters;
 
-if ~exist('isoutput','var')
-	isoutput = 0;
-end
 filename = fullfile(gsdfpath,'eikonal',[eventid,'_eikonal_',comp,'.mat']);
 if ~exist(filename,'file')
 	disp(['Cannot find:',filename])
@@ -23,12 +20,6 @@ r = 0.08;
 latlim = [25 50];
 lonlim = [-125 -65];
 
-for ip=1:length(eventphv)
-	img_filename = fullfile('htmls','event_files','pics',[eventid,'_',comp,'_',num2str(ip),'.png'])
-	if exist(img_filename,'file') && ~is_overwrite
-		disp(['Exist: ',img_filename,',skip!']);
-		continue;
-	end
 real_azi=angle(eventphv(ip).GVx + eventphv(ip).GVy.*sqrt(-1));
 real_azi = rad2deg(real_azi)+360-180;
 [dist azi] = distance(helmholtz(ip).xi,helmholtz(ip).yi,eventphv(ip).evla,eventphv(ip).evlo);
@@ -118,11 +109,4 @@ cbar_axis = colorbar();
 set(get(cbar_axis,'xlabel'),'String', 'degree');
 title('Propagation Direction Anomaly','fontsize',18)
 
-if isoutput
-	if ~exist('htmls/event_files/pics','dir')
-		mkdir('htmls/event_files/pics')
-	end
-	export_fig(img_filename,'-png','-m2');
-end
-
-end % end of ip loop
+disp(['Period: ',num2str(helmholtz(ip).period)]);

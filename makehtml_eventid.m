@@ -2,17 +2,18 @@ function makehtml_eventid(eventid,comp)
 % function to make html files and figures for single event
 
 is_overwrite = 0;
+setup_parameters;
 
 if ~exist('htmls/event_files','dir')
 	mkdir('htmls/event_files');
 end
-html_file = ['./htmls/event_files/',eventid,'_',comp,'.html'];
+html_file = fullfile('htmls','event_files'[eventid,'_',comp,'.html'];
 if exist(html_file,'file') && ~is_overwrite
 	disp(['Exist: ',html_file,', skip!']);
 	return;
 end
 
-matfilename = ['../',comp,'/eikonal/',eventid,'_eikonal_',comp,'.mat'];
+matfilename = fullfile(gsdfpath,'eikonal',[eventid,'_eikonal_',comp,'.mat'])
 if ~exist(matfilename,'file')
 	disp(['Cannot find:',matfilename])
 	return;

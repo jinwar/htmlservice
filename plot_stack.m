@@ -4,147 +4,105 @@
 
 clear;
 
-latlim = [25 50];
-lonlim = [-125 -65];
+setup_parameters;
+
 issmooth = 1;
 r=0.08;
+datafile = fullfile(gsdfpath,'helmholtz_stack_LHZ.mat');
 
-rayleigh_datafile = '../LHZ/helmholtz_stack_LHZ.mat';
-love_datafile = '../LHT/helmholtz_stack_LHT.mat';
+if ~exist('pics','dir')
+	mkdir('pics');
+end
+if ~exist(fullfile('pics','stack'),'dir')
+	mkdir(fullfile('pics','stack'));
+end
+if ~exist('htmls','dir')
+	mkdir('htmls');
+end
+if ~exist(fullfile('htmls','report_files'),'dir')
+	mkdir(fullfile('htmls','report_files'));
+end
 
-rayleigh = load(rayleigh_datafile);
-love = load(love_datafile);
+result = load(datafile);
 load seiscmap
+
+Nx = 2; Ny = 4;
+sidegap = 0.05; topgap = 0.03; botgap = 0.10; vgap = 0.05; hgap = 0.08;
+cbar_bot = 0.04;
+
+width = (1 - vgap*(Nx-1)-2*sidegap)/Nx;
+height = (1 - topgap - botgap - (Ny-1)*hgap)/Ny;
 
 % Make the general plot
 figure(88)
 clf
-rowN = 3;columnN = floor(length(rayleigh.avgphv)/rowN)+1;
 set(gcf,'color',[1 1 1]);
-for ip = 1:length(rayleigh.avgphv)
-	subplot(rowN,columnN,ip)
+set(gcf,'position',[150    50   700   900]);
+plot_array = [7 8 5 6 3 4 1 2];
+
+for ip = 1:length(result.avgphv)
+	ix = ceil(ip/2);
+	iy = ip - 2*(ix-1);
+	left = sidegap + (iy-1)*(vgap+width);
+	bot = botgap + (ix-1)*(hgap+height);
+	subplot('position',[left,bot,width,height]);
 	drawusa;
 	setm(gca,'fontsize',8);
-    GV = rayleigh.avgphv((ip)).GV;
-	if issmooth
-		GV = smoothmap_avg(GV,issmooth);
-	end
-	surfacem(rayleigh.avgphv((ip)).xi,rayleigh.avgphv((ip)).yi,GV);
+	pid = plot_array(ip);
+    GV = result.avgphv((pid)).GV;
+	surfacem(result.avgphv((pid)).xi,result.avgphv((pid)).yi,GV);
 	colormap(seiscmap)
 	meanphv = nanmean(GV(:));
 	caxis([meanphv*(1-r) meanphv*(1+r)])
-%	caxis([3.6 4])
 	colorbar
-    title(['Rayleigh Wave ',num2str(rayleigh.avgphv((ip)).period),'s  '],'fontsize',10);
+    title(['Rayleigh Wave ',num2str(result.avgphv((pid)).period),'s  '],'fontsize',10);
 end
 filename = ['pics/stack/RayleighUS'];
-print('-djpeg',filename);
+export_fig(filename,'-png','-m2');
 
 % make rayleigh event num map
 figure(88)
 clf
-rowN = 3;columnN = floor(length(rayleigh.avgphv)/rowN)+1;
 set(gcf,'color',[1 1 1]);
-for ip = 1:length(rayleigh.avgphv)
-	subplot(rowN,columnN,ip)
+set(gcf,'position',[150    50   700   900]);
+for ip = 1:length(result.avgphv)
+	ix = ceil(ip/2);
+	iy = ip - 2*(ix-1);
+	left = sidegap + (iy-1)*(vgap+width);
+	bot = botgap + (ix-1)*(hgap+height);
+	subplot('position',[left,bot,width,height]);
 	drawusa;
 	setm(gca,'fontsize',8);
-	surfacem(rayleigh.avgphv((ip)).xi,rayleigh.avgphv((ip)).yi,rayleigh.avgphv(ip).eventnum);
+	pid = plot_array(ip);
+	surfacem(result.avgphv((pid)).xi,result.avgphv((pid)).yi,result.avgphv(pid).eventnum);
 	colormap(seiscmap)
-	eventnum = rayleigh.avgphv(ip).eventnum;
+	eventnum = result.avgphv(pid).eventnum;
 	eventnum(find(eventnum==0)) = NaN;
 	meaneventnum = nanmedian(eventnum(:));
 	caxis([0 2*meaneventnum])
 	colorbar
-    title(['Rayleigh Eventnum ',num2str(rayleigh.avgphv((ip)).period),'s  '],'fontsize',10);
+    title(['Rayleigh Eventnum ',num2str(result.avgphv((pid)).period),'s  '],'fontsize',10);
 end
 filename = ['htmls/report_files/rayleigh_eventnummap'];
-print('-djpeg',filename);
+export_fig(filename,'-png','-m2');
 
 % Make single frequency plots
-for ip = 1:length(rayleigh.avgphv)
+for ip = 1:length(result.avgphv)
 	figure(88)
 	clf
+	set(gcf,'position',[150    50   600   400]);
 	set(gcf,'color',[1 1 1]);
 	drawusa;
-    GV = rayleigh.avgphv((ip)).GV;
-	if issmooth
-		GV = smoothmap_avg(GV,issmooth);
-	end
-	surfacem(rayleigh.avgphv((ip)).xi,rayleigh.avgphv((ip)).yi,GV);
+    GV = result.avgphv((ip)).GV;
+	surfacem(result.avgphv((ip)).xi,result.avgphv((ip)).yi,GV);
 	colormap(seiscmap)
 	meanphv = nanmean(GV(:));
 	caxis([meanphv*(1-r) meanphv*(1+r)])
 %	caxis([3.6 4])
 	colorbar
-    title(['Rayleigh Wave ',num2str(rayleigh.avgphv((ip)).period),'s  '],'fontsize',15);
+    title(['Rayleigh Wave ',num2str(result.avgphv((ip)).period),'s  '],'fontsize',15);
 	filename = ['pics/stack/rayleigh_',num2str(ip)];
-	print('-djpeg',filename);
+	export_fig(filename,'-png');
 end
 
 
-% Make the general plot for love wave
-figure(88)
-clf
-rowN = 3;columnN = floor(length(love.avgphv)/rowN)+1;
-set(gcf,'color',[1 1 1]);
-for ip = 1:length(love.avgphv)
-	subplot(rowN,columnN,ip)
-	drawusa;
-	setm(gca,'fontsize',8);
-    GV = love.avgphv((ip)).GV;
-	if issmooth
-		GV = smoothmap_avg(GV,issmooth);
-	end
-	surfacem(love.avgphv((ip)).xi,love.avgphv((ip)).yi,GV);
-	colormap(seiscmap)
-	meanphv = nanmean(GV(:));
-	caxis([meanphv*(1-r) meanphv*(1+r)])
-%	caxis([3.6 4])
-	colorbar
-    title(['Love Wave ',num2str(love.avgphv((ip)).period),'s  '],'fontsize',10);
-end
-filename = ['pics/stack/LoveUS'];
-print('-djpeg',filename);
-
-% make love event num map
-figure(88)
-clf
-rowN = 3;columnN = floor(length(love.avgphv)/rowN)+1;
-set(gcf,'color',[1 1 1]);
-for ip = 1:length(love.avgphv)
-	subplot(rowN,columnN,ip)
-	drawusa;
-	setm(gca,'fontsize',8);
-	surfacem(love.avgphv((ip)).xi,love.avgphv((ip)).yi,love.avgphv(ip).eventnum);
-	colormap(seiscmap)
-	eventnum = love.avgphv(ip).eventnum;
-	eventnum(find(eventnum==0)) = NaN;
-	meaneventnum = nanmedian(eventnum(:));
-	caxis([0 2*meaneventnum])
-	colorbar
-    title(['Love Event Number ',num2str(love.avgphv((ip)).period),'s  '],'fontsize',10);
-end
-filename = ['htmls/report_files/love_eventnummap'];
-print('-djpeg',filename);
-
-% Make single frequency plots for love wave
-for ip = 1:length(love.avgphv)
-	figure(88)
-	clf
-	set(gcf,'color',[1 1 1]);
-	drawusa;
-    GV = love.avgphv((ip)).GV;
-	if issmooth
-		GV = smoothmap_avg(GV,issmooth);
-	end
-	surfacem(love.avgphv((ip)).xi,love.avgphv((ip)).yi,GV);
-	colormap(seiscmap)
-	meanphv = nanmean(GV(:));
-	caxis([meanphv*(1-r) meanphv*(1+r)])
-%	caxis([3.6 4])
-	colorbar
-    title(['Love Wave ',num2str(love.avgphv((ip)).period),'s  '],'fontsize',15);
-	filename = ['pics/stack/love_',num2str(ip)];
-	print('-djpeg',filename);
-end
